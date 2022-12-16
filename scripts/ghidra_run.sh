@@ -16,11 +16,12 @@ function fail {
 
 test -z ${GHIDRA_ROOT-} && fail "Could not find \$GHIDRA_ROOT. Missing 'make env'?"
 test -z ${KAFL_ROOT-} && fail "Could not find \$KAFL_ROOT. Missing 'make env'?"
-test $# -eq 3 || fail "Missing arguments."
+[[ $# -eq 3 || $# -eq 4 ]]|| fail "Missing arguments."
 
 WORKDIR="$(realpath $1)" # kAFL work dir with traces/ folder
 TARGET="$(realpath $2)"  # original target input (tested with basic ELF file loaded as -kernel)
 SCRIPT="$(realpath $3)"  # script to run
+BASEADDR="$4"						 # optional: a base address for the binary to be loaded
 
 BIN=$GHIDRA_ROOT/support/analyzeHeadless
 PROJDIR=$WORKDIR/traces/ghidra
@@ -39,6 +40,16 @@ test -f "$WORKDIR/traces/edges_uniq.lst" || $KAFL_ROOT/tools/unique_edges.sh $WO
 ln -sf "$WORKDIR/traces/edges_uniq.lst" /tmp/edges_uniq.lst
 
 # create project and import binary - slow but only required once per binary
-test -f $PROJDIR/$PROJ.gpr || $BIN $PROJDIR $PROJ -import $TARGET -overwrite
+if test ! -f $PROJDIR/$PROJ.gpr
+then
+	if [[ $TARGET == *.debug ]]
+	then
+		test -z "$BASEADDR" && BASEADDR="0x00"
+		$BIN $PROJDIR $PROJ -import $TARGET -overwrite -loader ElfLoader -loader-imagebase $BASEADDR
+	else
+	$BIN $PROJDIR $PROJ -import $TARGET -overwrite
+	fi
+fi
+
 # analyse coverage
 $BIN $PROJDIR $PROJ -noanalysis -process $(basename $TARGET) -prescript GetAndSetAnalysisOptionsScript.java -scriptPath "$(dirname $SCRIPT)" -postscript "$(basename $SCRIPT)"
