@@ -11,9 +11,14 @@ class TdvfModule:
     '''A TDVF module object consisting of module name, image base address, info about the .text section and the file path of the module's .debug file'''
 
     # set max. address size to 64-bit 
-    __ADDR_MAX_VAL = 2**64
+    __ADDR_MAX_VAL = 2**64 - 1
 
     def __init__(self, name: str, img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=''):
+        assert self.__is_valid_address(img_base), "invalid image base address"
+        assert self.__is_valid_address(t_start), "invalid .text start address"
+        assert self.__is_valid_address(t_end), "invalid .text end address"
+        assert self.__is_valid_size(t_size), "invalid .text section size"
+        assert self.__is_valid_path(d_path), "invalid path to module .debug file"
         self.__name = name
         self.__img_base = img_base
         self.__t_start = t_start
@@ -28,17 +33,27 @@ class TdvfModule:
     def __lt__(self, other): 
         return self.name < other.name
 
-    def __validate_address(self, address:int):
-        '''perform some sanity checks on a given address'''
-        assert isinstance(address, int), "address must be an integer value"
-        assert address >= 0, "address must not be negative"
-        assert address <= self.__ADDR_MAX_VAL, "address must be max. 64-bit"
+    def __is_valid_address(self, address:int) -> bool:
+        '''perform some sanity checks on a given address
+        a valid address must be an integer value between 0 and ADDR_MAX_VAL (inclusively)
+        '''
+        if address and isinstance(address, int) and address >= 0 and address <= self.__ADDR_MAX_VAL:
+            return True
+        return False
 
-    def __validate_path(self, path:str):
-        '''perform some sanity checks on a given file/directory path'''
-        assert isinstance(path, str), "path must be a string"
-        assert path, "path string must not be empty"
-        assert os.path.exists(path), "invalid path: path \"path\" does not exist"
+    def __is_valid_size(self, size:int) -> bool:
+        '''a valid size is an integer value greater zero'''
+        if size and isinstance(size, int) and size > 0:
+            return True
+        return False
+
+    def __is_valid_path(self, path:str) -> bool:
+        '''perform some sanity checks on a given file/directory path
+        a valid path must be a non-empty path string pointing to an existing file/dir
+        '''
+        if path and isinstance(path, str) and os.path.exists(path):
+            return True
+        return False
 
     @property
     def name(self) -> str:
@@ -50,7 +65,7 @@ class TdvfModule:
 
     @img_base.setter
     def img_base(self, addr:int):
-        self.__validate_address(addr)
+        assert self.__is_valid_address(addr), "invalid image base address"
         self.__img_base = addr
 
     @property
@@ -59,7 +74,7 @@ class TdvfModule:
 
     @t_start.setter
     def t_start(self, addr:int):
-        self.__validate_address(addr)
+        assert self.__is_valid_address(addr), "invalid .text start address"
         self.__t_start = addr
 
     @property
@@ -68,7 +83,7 @@ class TdvfModule:
 
     @t_end.setter
     def t_end(self, addr:int):
-        self.__validate_address(addr)
+        assert self.__is_valid_address(addr), "invalid .text end address"
         self.__t_end = addr
 
     @property
@@ -77,7 +92,7 @@ class TdvfModule:
 
     @t_size.setter
     def t_size(self, size:int):
-        assert isinstance(size, int), "size of .text section must be an int"
+        assert self.__is_valid_size(size), "invalid .text section size"
         self.__t_size = size
 
     @property
@@ -86,7 +101,7 @@ class TdvfModule:
 
     @d_path.setter
     def d_path(self, path:str):
-        self.__validate_path(path)
+        assert self.__is_valid_path(path), "invalid path to module .debug file"
         self.__d_path = path
 
     def to_dict(self) -> dict:
@@ -115,7 +130,7 @@ class TdvfModule:
     def compute_tstart(self, t_offset:int) -> int:
         '''calculate .text start address from module's image base address and an offset'''
         assert self.img_base, "cannot compute .text start without image base"
-        self.__validate_address(t_offset)
+        assert self.__is_valid_address(t_offset), "invalid offset value"
         return self.img_base + t_offset
     
     def compute_tend(self, t_size:int=None, t_start:int=None) -> int:
@@ -125,10 +140,9 @@ class TdvfModule:
         if not t_start:
             t_start = self.t_start
         assert self.img_base, "cannot compute .text start without image base"
-        assert t_size, "cannot compute .text end without .text size"
-        assert isinstance(t_size, int), ".text size is not an integer value"
-        assert t_size >= 0, ".text size must not be negative"
         assert self.t_start, "cannot compute .text end without .text start"
+        assert t_size, "cannot compute .text end without .text size"
+        assert self.__is_valid_size(t_size), "invalid .text size value"
         return t_start + t_size
     
     def fill_text_info(self):
