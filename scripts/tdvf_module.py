@@ -157,7 +157,7 @@ class TdvfModuleTable:
     '''A sorted list of TDVF modules that can be presented in tabular form'''
     def __init__(self, module_list:List[TdvfModule]=None):
         for m in module_list:
-            self.__validate_module(m)
+            assert self.__is_valid_module(m), f"invalid module \"{m.name}\""
         self.__modules = sorted(module_list)
 
     def __int_to_addr(self, address: int, prefix:bool = True) -> str:
@@ -175,9 +175,11 @@ class TdvfModuleTable:
             addr = self.__int_to_addr(int(address, 16), prefix)
         return addr
 
-    def __validate_module(self, module:TdvfModule):
-        assert isinstance(module, TdvfModule), "module must be an instance of the TdvfModule class"
-        assert module.name, "module name must not be empty"
+    def __is_valid_module(self, module:TdvfModule):
+        '''a valid module is of TdvfModule type and has a non-empty name'''
+        if module and isinstance(module, TdvfModule) and module.name:
+            return True
+        return False
 
     def __str__(self):
         s = ''
@@ -199,11 +201,11 @@ class TdvfModuleTable:
     @modules.setter
     def modules(self, module_list:List[TdvfModule]):
         for m in module_list:
-            self.__validate_module(m)
+            assert self.__is_valid_module(m), f"invalid module \"{m.name}\""
         self.modules = sorted(module_list)
 
     def add_module(self, module:TdvfModule):
-        self.__validate_module(module)
+        assert self.__is_valid_module(module), f"invalid module \"{module.name}\""
         self.modules.append(module)
         self.modules = sorted(self.modules)
     
