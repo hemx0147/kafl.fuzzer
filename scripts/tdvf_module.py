@@ -2,6 +2,7 @@
 
 import re
 import json
+from enum import Enum
 import os.path
 from typing import List, Tuple
 from elftools.elf.elffile import ELFFile
@@ -41,9 +42,16 @@ class Address:
 class TdvfModule:
     '''A TDVF module object consisting of module name, image base address, info about the .text section and the file path of the module's .debug file'''
 
-    def __init__(self, name: str, img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=None):
-        assert name, "name must contain at least one character"
-        self.__name = name
+    class TMI(Enum):
+        mname = 'name'
+        img_base = 'img_base'
+        t_start = 'text_start'
+        t_end = 'text_end'
+        t_size = 'text_size'
+        d_path = 'debug_path'
+
+    def __init__(self, name:str='', img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=None):
+        self.name = name
         self.img_base = img_base
         self.t_start = t_start
         self.t_end = t_end
@@ -60,6 +68,10 @@ class TdvfModule:
     @property
     def name(self) -> str:
         return self.__name
+
+    @name.setter
+    def name(self, name:str):
+        self.__name = name
 
     @property
     def img_base(self) -> int:
@@ -117,6 +129,15 @@ class TdvfModule:
             'debug_path': self.d_path
         }
         return d
+    
+    def from_dict(self, d:dict={}):
+        name = d['name']
+        img_base = d['img_base']
+        t_start = d['text_start']
+        t_end = d['text_end']
+        t_size = d['text_size']
+        d_path = d['debug_path']
+        self.__init__(name, img_base, t_start, t_end, t_size, d_path)
     
     def get_toffset_and_tsize(self) -> Tuple[Address, int]:
         '''analyze this module's .debug file and obtain offset & size of its .text section'''
@@ -197,8 +218,8 @@ class TdvfModuleTable:
         if isinstance(modules, dict):
             modules = modules.values()
         for m in modules:
-            assert isinstance(m, TdvfModule), "module must be of type TdvfModule"
-            assert m.name, "module name is empty"
+            if not isinstance(m, TdvfModule):
+                assert m['name'], "module name is empty"
         self.__modules = dict((m.name, m) for m in sorted(modules))
 
     def fill_text_info(self):
@@ -257,3 +278,16 @@ class TdvfModuleTable:
         '''Write all module info to a json file, optionally pretty printed''' 
         with open(file_name, 'w') as f:
             f.write(self.to_json(only_modules, pretty))
+    
+    def read_from_file(self, file_name=str):
+        '''read module information from file and create a TdvfModuleTable accordingly'''
+        assert os.path.isfile(file_name), f'cannot find file \"{file_name}\"'
+        with open(file_name, 'r') as f:
+            module_info = json.load(f)
+        
+        modules = []
+        for minfo in module_info:
+            m = TdvfModule()
+            m.from_dict(minfo)
+            modules.append(m)
+        self.__init__(modules)
