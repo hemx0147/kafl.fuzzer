@@ -1,5 +1,6 @@
 # Some helper classes to deal with TDVF modules
 
+import re
 import json
 import os.path
 from typing import List, Tuple
@@ -16,58 +17,38 @@ class Address:
         '''initialize an Address object with given value.
         value can be anything that can be converted to int.
         '''
-        try:
+        if isinstance(value, str):
             value = int(value, 16)
-        except:
-            value = int(value)
-        assert self.__is_valid_address(value), f'invalid address value "{value}"'
-        self.__value = value
-        self.__address = hex(value)
-
-    def __is_valid_address(self, address:int) -> bool:
-        '''perform some sanity checks on a given address
-        a valid address must be an integer value between 0 and ADDR_MAX_VAL (inclusively)
-        '''
-        if address is not None and isinstance(address, int) and address >= 0 and address <= self.__ADDR_MAX_VAL:
-            return True
-        return False
-
-    @property
-    def address(self) -> str:
-        return self.__address
-    
-    @address.setter
-    def address(self, address):
-        assert self.__is_valid_address(address), f'invalid address value "{address}"'
-        self.__address = address
-        self.__value = int(address, 16)
-    
-    @property
-    def value(self) -> int:
-        return self.__value
-
-    @value.setter
-    def value(self, value):
-        assert self.__is_valid_address(value), f'invalid address value "{value}"'
+        value = int(value)
+        assert value is not None, 'no address value given'
+        assert isinstance(value, int), 'address value must be an int'
+        assert value >= 0, 'address value must be positive'
+        assert value <= self.__ADDR_MAX_VAL, f'address value must be smaller or equal to {self.__ADDR_MAX_VAL}'
         self.__value = value
         self.__address = hex(value)
 
     def __str__(self) -> str:
         return self.__address
+    
+    def __int__(self) -> int:
+        return self.__value
+    
+    def __add__(self, other):
+        return Address(int(self) + int(other))
+    
 
 
 class TdvfModule:
     '''A TDVF module object consisting of module name, image base address, info about the .text section and the file path of the module's .debug file'''
 
     def __init__(self, name: str, img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=''):
-        assert self.__is_valid_size(t_size), "invalid .text section size"
-        assert self.__is_valid_path(d_path), "invalid path to module .debug file"
+        assert name, "name must contain at least one character"
         self.__name = name
-        self.__img_base = Address(img_base)
-        self.__t_start = Address(t_start)
-        self.__t_end = Address(t_end)
-        self.__t_size = t_size
-        self.__d_path = d_path
+        self.img_base = img_base
+        self.t_start = t_start
+        self.t_end = t_end
+        self.t_size = t_size
+        self.d_path = d_path
     
     def __str__(self) -> str:
         return str(self.to_dict())
@@ -124,7 +105,9 @@ class TdvfModule:
 
     @t_size.setter
     def t_size(self, size:int):
-        assert self.__is_valid_size(size), "invalid .text section size"
+        assert size is not None, "no .text size value given"
+        assert isinstance(size, int), ".text size value must be an integer"
+        assert size >= 0, ".text size value must be positive"
         self.__t_size = size
 
     @property
@@ -147,7 +130,7 @@ class TdvfModule:
         }
         return d
     
-    def get_toffset_and_tsize(self) -> Tuple[Address, Address]:
+    def get_toffset_and_tsize(self) -> Tuple[Address, int]:
         '''analyze this module's .debug file and obtain offset & size of its .text section'''
         with open(self.d_path, 'rb') as f:
             module_elf = ELFFile(f)
@@ -157,24 +140,22 @@ class TdvfModule:
                 tsize = section.header['sh_size']
                 toffset = section.header['sh_addr']
                 break
-        return Address(toffset), Address(tsize)
+        return Address(toffset), tsize
     
     def compute_tstart(self, t_offset:Address) -> Address:
         '''calculate .text start address from module's image base address and an offset'''
         assert self.img_base, "cannot compute .text start without image base"
-        return self.img_base + Address(t_offset)
+        return self.img_base + t_offset
     
-    def compute_tend(self, t_size:int=None, t_start:Address=None) -> Address:
+    def compute_tend(self, t_start:Address=None, t_size:int=None) -> Address:
         '''calculate .text end address from module's image base and .text start addresses and a size value'''
-        if not t_size:
-            t_size = self.t_size
-        if not t_start:
+        if t_start is None:
             t_start = self.t_start
-        assert self.img_base, "cannot compute .text start without image base"
-        assert self.t_start, "cannot compute .text end without .text start"
+        if t_size is None:
+            t_size = self.t_size
+        assert t_start, "cannot compute .text end without .text start"
         assert t_size, "cannot compute .text end without .text size"
-        assert self.__is_valid_size(t_size), "invalid .text size value"
-        return t_start + t_size
+        return Address(int(t_start) + t_size)
     
     def fill_text_info(self):
         '''fill the module's missing .text start, -end & -size info'''
@@ -191,21 +172,6 @@ class TdvfModuleTable:
             assert self.__is_valid_module(m), f"invalid module \"{m.name}\""
         self.__modules = sorted(module_list)
 
-    def __int_to_addr(self, address: int, prefix:bool = True) -> str:
-        '''format an address value (int) to hex-address format ("0x"-prefix followed by 16 hex chars)'''
-        hexval = hex(address)[2:]     # hex address without '0x' prefix for further processing
-        _prefix = ''
-        if prefix:
-                _prefix = '0x'    # prepend '0x' if necessary
-        return _prefix + '{0:0>16}'.format(hexval)
-
-    def __str_to_addr(self, address: str, prefix:bool = True) -> str:
-        '''format an address value string to hex-address format ("0x" followed by 16 hex chars)'''
-        addr = ""
-        if address:
-            addr = self.__int_to_addr(int(address, 16), prefix)
-        return addr
-
     def __is_valid_module(self, module:TdvfModule):
         '''a valid module is of TdvfModule type and has a non-empty name'''
         if module and isinstance(module, TdvfModule) and module.name:
@@ -216,9 +182,9 @@ class TdvfModuleTable:
         s = ''
         for module in self.modules:
             _name = module.name
-            _base = self.__int_to_addr(module.img_base, False)
-            _start = self.__int_to_addr(module.t_start, False)
-            _end = self.__int_to_addr(module.t_end, False)
+            _base = Address(module.img_base)
+            _start = Address(module.t_start)
+            _end = Address(module.t_end)
             _size = module.t_size
             _path = module.d_path
             s += f'{_name} {_base} {_start} {_end} {_size} {_path}\n'
@@ -248,24 +214,20 @@ class TdvfModuleTable:
             raise Exception("module table does not contain module named \"name\"")
         return module
 
-    def print_table(self, only_modules:List[str]=[], header:bool=True, i_base:bool=True, t_start:bool=True, t_end:bool=True, t_size:bool=True, d_path:bool=True):
+    def print_table(self, only_modules:List[str]=[], header:bool=True):
         for mname in only_modules:
             assert mname, "module name must not be empty"
 
         # build table header
         if header:
             hname = "Module Name"
-            if i_base:
-                hbase = "Image Base"
-            if t_start:
-                hstart = ".text Start"
-            if t_end:
-                hend = ".text End"
-            if t_size:
-                hsize = "Size"
-            if d_path:
-                hpath = "Debug Path"
-            print(f'{hname:<32} {hbase:<16} {hstart:<16} {hend:<16} {hsize:0>6} {hpath}')
+            hbase = "Image Base"
+            hstart = ".text Start"
+            hend = ".text End"
+            hsize = "Size"
+            hpath = "Debug Path"
+            print(f'{hname:<32} {hbase:<12} {hstart:<12} {hend:<12} {hsize:<6} {hpath}')
+            print('-' * 164)
         
         # build table body
         for module in self.modules:
@@ -274,17 +236,12 @@ class TdvfModuleTable:
                 continue
             _name = module.name
             _base = _start = _end = _size = _path = ""
-            if i_base:
-                _base = self.__int_to_addr(module.img_base, False)
-            if t_start:
-                _start = self.__int_to_addr(module.t_start, False)
-            if t_end:
-                _end = self.__int_to_addr(module.t_end, False)
-            if t_size:
-                _size = module.t_size
-            if d_path:
-                _path = module.d_path
-                print(f'{_name:<32} {_base:<16} {_start:<16} {_end:<16} {_size:0>6} {_path}')
+            _base = str(module.img_base)[2:]
+            _start = str(module.t_start)[2:]
+            _end = str(module.t_end)[2:]
+            _size = module.t_size
+            _path = module.d_path
+            print(f'{_name:<32} {_base:0>12} {_start:0>12} {_end:0>12} {_size:>6} {_path}')
 
     def to_json_file(self, file_name:str='modules.json', pretty:bool=True):
         '''Write all module info to a json file, optionally pretty printed''' 
