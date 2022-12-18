@@ -41,7 +41,7 @@ class Address:
 class TdvfModule:
     '''A TDVF module object consisting of module name, image base address, info about the .text section and the file path of the module's .debug file'''
 
-    def __init__(self, name: str, img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=''):
+    def __init__(self, name: str, img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=None):
         assert name, "name must contain at least one character"
         self.__name = name
         self.img_base = img_base
@@ -56,20 +56,6 @@ class TdvfModule:
     # define less-than method so class instances can be easily sorted
     def __lt__(self, other): 
         return self.name < other.name
-
-    def __is_valid_size(self, size:int) -> bool:
-        '''a valid size is a positive integer value'''
-        if size is not None and isinstance(size, int) and size >= 0:
-            return True
-        return False
-
-    def __is_valid_path(self, path:str) -> bool:
-        '''perform some sanity checks on a given file/directory path
-        a valid path must be a non-empty path string pointing to an existing file/dir
-        '''
-        if path and isinstance(path, str) and os.path.exists(path):
-            return True
-        return False
 
     @property
     def name(self) -> str:
@@ -116,15 +102,17 @@ class TdvfModule:
 
     @d_path.setter
     def d_path(self, path:str):
-        assert self.__is_valid_path(path), "invalid path to module .debug file"
+        if path:
+            assert isinstance(path, str), "path must be of type str"
+            assert os.path.exists(path), "invalid path to module .debug file"
         self.__d_path = path
 
     def to_dict(self) -> dict:
         d = {
             'name': self.name,
-            'img_base': self.img_base,
-            'text_start': self.t_start,
-            'text_end': self.t_end,
+            'img_base': str(self.img_base),
+            'text_start': str(self.t_start),
+            'text_end': str(self.t_end),
             'text_size': self.t_size,
             'debug_path': self.d_path
         }
@@ -157,30 +145,37 @@ class TdvfModule:
         assert t_size, "cannot compute .text end without .text size"
         return Address(int(t_start) + t_size)
     
-    def fill_text_info(self):
+    def fill_text_info(self, debug_path:str=None):
         '''fill the module's missing .text start, -end & -size info'''
+        if not debug_path:
+            debug_path = self.d_path
+        assert self.d_path, "must specify a valid module .debug file path"
         t_offset, self.t_size = self.get_toffset_and_tsize()
         self.t_start = self.compute_tstart(t_offset)
         self.t_end = self.compute_tend()
+    
+    def print_short(self):
+        print(f'{self.name} {self.img_base} {self.t_start}-{self.t_end}')
+    
+    def to_json(self, pretty=True):
+        '''transform this module's info to a json object'''
+        indent = None
+        if pretty:
+            indent = 4
+        return json.dumps(self.to_dict(), indent=indent)
+
 
 
 
 class TdvfModuleTable:
-    '''A sorted list of TDVF modules that can be presented in tabular form'''
-    def __init__(self, module_list:List[TdvfModule]=[]):
-        for m in module_list:
-            assert self.__is_valid_module(m), f"invalid module \"{m.name}\""
-        self.__modules = sorted(module_list)
-
-    def __is_valid_module(self, module:TdvfModule):
-        '''a valid module is of TdvfModule type and has a non-empty name'''
-        if module and isinstance(module, TdvfModule) and module.name:
-            return True
-        return False
+    '''A sorted dict of TDVF modules that can be presented in tabular form'''
+    def __init__(self, modules=None):
+        '''create a new TdvfModuleTable'''
+        self.modules = modules
 
     def __str__(self):
         s = ''
-        for module in self.modules:
+        for module in self.modules.values():
             _name = module.name
             _base = Address(module.img_base)
             _start = Address(module.t_start)
@@ -192,34 +187,31 @@ class TdvfModuleTable:
         return s.strip()
 
     @property
-    def modules(self) -> list:
+    def modules(self) -> dict:
         return self.__modules
 
     @modules.setter
-    def modules(self, module_list:List[TdvfModule]):
-        for m in module_list:
-            assert self.__is_valid_module(m), f"invalid module \"{m.name}\""
-        self.modules = sorted(module_list)
+    def modules(self, modules):
+        if modules is None:
+            modules = []
+        if isinstance(modules, dict):
+            modules = modules.values()
+        for m in modules:
+            assert isinstance(m, TdvfModule), "module must be of type TdvfModule"
+            assert m.name, "module name is empty"
+        self.__modules = dict((m.name, m) for m in sorted(modules))
 
-    def add_module(self, module:TdvfModule):
-        assert self.__is_valid_module(module), f"invalid module \"{module.name}\""
-        self.modules.append(module)
-        self.modules.sort()
-    
-    def get_module(self, name:str) -> TdvfModule:
-        '''return a single module from the table matching the specified name'''
-        try:
-            module = next(filter(lambda module: name == module.name, self.modules))
-        except StopIteration:
-            raise Exception("module table does not contain module named \"name\"")
-        return module
+    def fill_text_info(self):
+        '''fill all modules missing .text start, -end & -size info'''
+        for m in self.modules.values():
+            m.fill_text_info()
 
-    def print_table(self, only_modules:List[str]=[], header:bool=True):
+    def print_modules(self, only_modules:List[str]=[], print_table:bool=False):
         for mname in only_modules:
             assert mname, "module name must not be empty"
 
-        # build table header
-        if header:
+        if print_table:
+            # print table header
             hname = "Module Name"
             hbase = "Image Base"
             hstart = ".text Start"
@@ -229,24 +221,39 @@ class TdvfModuleTable:
             print(f'{hname:<32} {hbase:<12} {hstart:<12} {hend:<12} {hsize:<6} {hpath}')
             print('-' * 164)
         
-        # build table body
-        for module in self.modules:
+        # print body
+        for module in self.modules.values():
             if only_modules and module.name not in only_modules:
                 # if only_modules is given, print only those
                 continue
-            _name = module.name
-            _base = _start = _end = _size = _path = ""
-            _base = str(module.img_base)[2:]
-            _start = str(module.t_start)[2:]
-            _end = str(module.t_end)[2:]
-            _size = module.t_size
-            _path = module.d_path
-            print(f'{_name:<32} {_base:0>12} {_start:0>12} {_end:0>12} {_size:>6} {_path}')
+            if print_table:
+                _name = module.name
+                _base = _start = _end = _size = _path = ""
+                _base = str(module.img_base)[2:]
+                _start = str(module.t_start)[2:]
+                _end = str(module.t_end)[2:]
+                _size = module.t_size
+                _path = module.d_path
+                print(f'{_name:<32} {_base:0>12} {_start:0>12} {_end:0>12} {_size:>6} {_path}')
+            else:
+                module.print_short()
 
-    def to_json_file(self, file_name:str='modules.json', pretty:bool=True):
-        '''Write all module info to a json file, optionally pretty printed''' 
+    def print_short(self, only_modules:List[str]=[]):
+        self.print_modules(only_modules, False)
+
+    def print_table(self, only_modules:List[str]=[]):
+        self.print_modules(only_modules, True)
+    
+    def to_json(self, only_modules:List[str]=[], pretty:bool=True) -> str:
         indent = None
         if pretty:
             indent = 4
+        if not only_modules:
+            only_modules = self.modules.keys()
+        l = list(self.modules[name].to_dict() for name in only_modules)
+        return json.dumps(l, indent=indent)
+    
+    def write_to_file(self, only_modules:List[str]=[], file_name:str='modules.json', pretty:bool=True):
+        '''Write all module info to a json file, optionally pretty printed''' 
         with open(file_name, 'w') as f:
-            json.dump(self.modules, f, indent=indent)
+            f.write(self.to_json(only_modules, pretty))
