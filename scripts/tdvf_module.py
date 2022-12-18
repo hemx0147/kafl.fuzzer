@@ -6,12 +6,58 @@ from typing import List, Tuple
 from elftools.elf.elffile import ELFFile
 
 
+class Address:
+    '''A helper class for dealing with int-str address conversion'''
+
+    # set max. address size to 64-bit 
+    __ADDR_MAX_VAL = 2 ** 64 - 1
+
+    def __init__(self, value):
+        '''initialize an Address object with given value.
+        value can be anything that can be converted to int.
+        '''
+        try:
+            value = int(value, 16)
+        except:
+            value = int(value)
+        assert self.__is_valid_address(value), f'invalid address value "{value}"'
+        self.__value = value
+        self.__address = hex(value)
+
+    def __is_valid_address(self, address:int) -> bool:
+        '''perform some sanity checks on a given address
+        a valid address must be an integer value between 0 and ADDR_MAX_VAL (inclusively)
+        '''
+        if address is not None and isinstance(address, int) and address >= 0 and address <= self.__ADDR_MAX_VAL:
+            return True
+        return False
+
+    @property
+    def address(self) -> str:
+        return self.__address
+    
+    @address.setter
+    def address(self, address):
+        assert self.__is_valid_address(address), f'invalid address value "{address}"'
+        self.__address = address
+        self.__value = int(address, 16)
+    
+    @property
+    def value(self) -> int:
+        return self.__value
+
+    @value.setter
+    def value(self, value):
+        assert self.__is_valid_address(value), f'invalid address value "{value}"'
+        self.__value = value
+        self.__address = hex(value)
+
+    def __str__(self) -> str:
+        return self.__address
+
 
 class TdvfModule:
     '''A TDVF module object consisting of module name, image base address, info about the .text section and the file path of the module's .debug file'''
-
-    # set max. address size to 64-bit 
-    __ADDR_MAX_VAL = 2**64 - 1
 
     def __init__(self, name: str, img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=''):
         assert self.__is_valid_address(img_base), "invalid image base address"
@@ -33,13 +79,6 @@ class TdvfModule:
     def __lt__(self, other): 
         return self.name < other.name
 
-    def __is_valid_address(self, address:int) -> bool:
-        '''perform some sanity checks on a given address
-        a valid address must be an integer value between 0 and ADDR_MAX_VAL (inclusively)
-        '''
-        if address and isinstance(address, int) and address >= 0 and address <= self.__ADDR_MAX_VAL:
-            return True
-        return False
 
     def __is_valid_size(self, size:int) -> bool:
         '''a valid size is an integer value greater zero'''
