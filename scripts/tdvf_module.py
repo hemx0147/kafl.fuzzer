@@ -60,15 +60,12 @@ class TdvfModule:
     '''A TDVF module object consisting of module name, image base address, info about the .text section and the file path of the module's .debug file'''
 
     def __init__(self, name: str, img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=''):
-        assert self.__is_valid_address(img_base), "invalid image base address"
-        assert self.__is_valid_address(t_start), "invalid .text start address"
-        assert self.__is_valid_address(t_end), "invalid .text end address"
         assert self.__is_valid_size(t_size), "invalid .text section size"
         assert self.__is_valid_path(d_path), "invalid path to module .debug file"
         self.__name = name
-        self.__img_base = img_base
-        self.__t_start = t_start
-        self.__t_end = t_end
+        self.__img_base = Address(img_base)
+        self.__t_start = Address(t_start)
+        self.__t_end = Address(t_end)
         self.__t_size = t_size
         self.__d_path = d_path
     
@@ -78,7 +75,6 @@ class TdvfModule:
     # define less-than method so class instances can be easily sorted
     def __lt__(self, other): 
         return self.name < other.name
-
 
     def __is_valid_size(self, size:int) -> bool:
         '''a valid size is a positive integer value'''
@@ -104,8 +100,7 @@ class TdvfModule:
 
     @img_base.setter
     def img_base(self, addr:int):
-        assert self.__is_valid_address(addr), "invalid image base address"
-        self.__img_base = addr
+        self.__img_base = Address(addr)
 
     @property
     def t_start(self) -> int:
@@ -113,8 +108,7 @@ class TdvfModule:
 
     @t_start.setter
     def t_start(self, addr:int):
-        assert self.__is_valid_address(addr), "invalid .text start address"
-        self.__t_start = addr
+        self.__t_start = Address(addr)
 
     @property
     def t_end(self) -> int:
@@ -122,8 +116,7 @@ class TdvfModule:
 
     @t_end.setter
     def t_end(self, addr:int):
-        assert self.__is_valid_address(addr), "invalid .text end address"
-        self.__t_end = addr
+        self.__t_end = Address(addr)
 
     @property
     def t_size(self) -> int:
@@ -154,7 +147,7 @@ class TdvfModule:
         }
         return d
     
-    def get_toffset_and_tsize(self) -> Tuple[int, int]:
+    def get_toffset_and_tsize(self) -> Tuple[Address, Address]:
         '''analyze this module's .debug file and obtain offset & size of its .text section'''
         with open(self.d_path, 'rb') as f:
             module_elf = ELFFile(f)
@@ -164,15 +157,14 @@ class TdvfModule:
                 tsize = section.header['sh_size']
                 toffset = section.header['sh_addr']
                 break
-        return toffset, tsize
+        return Address(toffset), Address(tsize)
     
-    def compute_tstart(self, t_offset:int) -> int:
+    def compute_tstart(self, t_offset:Address) -> Address:
         '''calculate .text start address from module's image base address and an offset'''
         assert self.img_base, "cannot compute .text start without image base"
-        assert self.__is_valid_address(t_offset), "invalid offset value"
-        return self.img_base + t_offset
+        return self.img_base + Address(t_offset)
     
-    def compute_tend(self, t_size:int=None, t_start:int=None) -> int:
+    def compute_tend(self, t_size:int=None, t_start:Address=None) -> Address:
         '''calculate .text end address from module's image base and .text start addresses and a size value'''
         if not t_size:
             t_size = self.t_size
