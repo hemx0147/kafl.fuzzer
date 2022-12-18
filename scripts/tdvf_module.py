@@ -81,8 +81,8 @@ class TdvfModule:
 
 
     def __is_valid_size(self, size:int) -> bool:
-        '''a valid size is an integer value greater zero'''
-        if size and isinstance(size, int) and size > 0:
+        '''a valid size is a positive integer value'''
+        if size is not None and isinstance(size, int) and size >= 0:
             return True
         return False
 
@@ -194,7 +194,7 @@ class TdvfModule:
 
 class TdvfModuleTable:
     '''A sorted list of TDVF modules that can be presented in tabular form'''
-    def __init__(self, module_list:List[TdvfModule]=None):
+    def __init__(self, module_list:List[TdvfModule]=[]):
         for m in module_list:
             assert self.__is_valid_module(m), f"invalid module \"{m.name}\""
         self.__modules = sorted(module_list)
@@ -246,7 +246,7 @@ class TdvfModuleTable:
     def add_module(self, module:TdvfModule):
         assert self.__is_valid_module(module), f"invalid module \"{module.name}\""
         self.modules.append(module)
-        self.modules = sorted(self.modules)
+        self.modules.sort()
     
     def get_module(self, name:str) -> TdvfModule:
         '''return a single module from the table matching the specified name'''
