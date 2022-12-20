@@ -25,7 +25,7 @@ def get_targets_from_file(file_path:str):
         # file contains list of TdvfModule objects in json format
         mt = TdvfModuleTable()
         mt.read_from_file(file_path)
-        targets = dict((module.d_path, module.img_base) for module in mt.modules)
+        targets = dict((module.d_path, module.img_base) for module in mt.modules.values())
     else:
         # file line format: "<binary-path> <base-address>"
         with open(file_path, 'r') as f:
