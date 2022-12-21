@@ -1,12 +1,19 @@
 import os   # access shell environment
+import sys  # print on stderr
 import subprocess
 from tdvf_module import *
 import argparse
 
+def get_env_var(var_name:str):
+    try:
+        var_value = os.environ[var_name]
+    except Exception as e:
+        print(f"Could not find \${var_name}. Missing 'make env'?", file=sys.stderr)
+        exit(-1)
+    return var_value
 
-def ghidra_import_targets(proj_dir:str, proj_name:str, targets:dict) -> Tuple[str, str]:
+def ghidra_import_targets(proj_dir:str, proj_name:str, ghidra_bin:str, targets:dict) -> Tuple[str, str]:
     '''load a set of target binaries at an offset into the ghidra project and return process stdout & stderr'''
-    ghidra_bin = os.environ['GHIDRA_ROOT'] + '/support/analyzeHeadless'
     for target, address in targets.items():
         # command line to execute
         print(f'ghidra import {target} @ {address}')
@@ -65,6 +72,12 @@ if __name__ == "__main__":
         help='The base address where the target image should be loaded to. If this option is omitted, TARGET will be treated as a path to a target specification file.'
     )
 
+    # assert that we are within kAFL environment & ghidra binary exists
+    get_env_var('KAFL_ROOT')
+    ghidra_root = get_env_var('GHIDRA_ROOT')
+    ghidra_bin = ghidra_root + '/support/analyzeHeadless'
+    assert os.path.isfile(ghidra_bin), "Could not find Ghidra headless binary"
+
     args = parser.parse_args()
 
     workdir = args.workdir
@@ -77,5 +90,5 @@ if __name__ == "__main__":
 
     proj_dir = workdir + '/traces/ghidra'
     proj_name = 'cov_analysis'
-    print(targets)
-    ghidra_import_targets(proj_dir, proj_name, targets)
+    # print(targets)
+    ghidra_import_targets(proj_dir, proj_name, ghidra_bin, targets)
