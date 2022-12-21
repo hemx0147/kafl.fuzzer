@@ -68,12 +68,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     workdir = args.workdir
-    file_path = args.target
+    target_path = args.target
     if args.address:
         address = args.address
-        targets = {file_path: address}
+        targets = {target_path: address}
     else:
-        targets = get_targets_from_file(file_path)
+        targets = get_targets_from_file(target_path)
 
     proj_dir = workdir + '/traces/ghidra'
     proj_name = 'cov_analysis'
