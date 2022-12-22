@@ -12,15 +12,17 @@ def get_env_var(var_name:str):
         exit(-1)
     return var_value
 
-def ghidra_import_targets(proj_dir:str, proj_name:str, ghidra_bin:str, targets:dict) -> Tuple[str, str]:
+def ghidra_import_targets(proj_dir:str, proj_name:str, ghidra_bin:str, targets:dict):
     '''load a set of target binaries at an offset into the ghidra project and return process stdout & stderr'''
-    for target, address in targets.items():
+    num_targets = len(targets)
+    for i, (target, address) in enumerate(targets.items()):
         # command line to execute
-        print(f'ghidra import {target} @ {address}')
+        print(f'ghidra import {target} @ {address} to {proj_dir}/{proj_name}.gpr')
+        print(f'completed {i}/{num_targets}')
         args = [ghidra_bin, proj_dir, proj_name, '-import', target, '-overwrite', '-loader', 'ElfLoader', '-loader-imagebase', address]
-        # TODO: fix ghidra invocation (currently only first target is imported but nothing more)
         completed_proc = subprocess.run(args, capture_output=True, encoding='utf-8')
-        return completed_proc.stdout, completed_proc.stderr
+        print(completed_proc.stdout)
+    print(f'completed {num_targets}/{num_targets}')
 
 def get_targets_from_file(file_path:str):
     if file_path.endswith('.json'):
