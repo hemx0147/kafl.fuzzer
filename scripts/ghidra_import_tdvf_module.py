@@ -33,7 +33,7 @@ def get_targets_from_file(file_path:str):
     else:
         # file line format: "<binary-path> <base-address>"
         with open(file_path, 'r') as f:
-            lines = f.readlines().strip()
+            lines = list(line.strip() for line in f.readlines())
         targets = dict(map(lambda s: tuple(s.split(' ')), lines))
     return targets
 
