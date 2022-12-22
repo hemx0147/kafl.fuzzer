@@ -51,7 +51,8 @@ def file_path(path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Import binaries into Ghidra for further analysis.'
+        description='Import binaries into Ghidra for further analysis.',
+        epilog='Note that importing modules may take a while but needs to be done only once.'
     )
 
     parser.add_argument(
