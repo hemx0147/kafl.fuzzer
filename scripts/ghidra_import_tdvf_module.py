@@ -75,15 +75,18 @@ if __name__ == "__main__":
         help='The base address where the target image should be loaded to. If this option is omitted, TARGET will be treated as a path to a target specification file.'
     )
 
+    args = parser.parse_args()
+
     # assert that we are within kAFL environment & ghidra binary exists
     get_env_var('KAFL_ROOT')
     ghidra_root = get_env_var('GHIDRA_ROOT')
     ghidra_bin = ghidra_root + '/support/analyzeHeadless'
     assert os.path.isfile(ghidra_bin), "Could not find Ghidra headless binary"
-
-    args = parser.parse_args()
-
     workdir = args.workdir
+    proj_dir = workdir + '/traces/ghidra'
+    assert os.path.isdir(proj_dir), 'workdir does not contain traces/ghidra subfolders'
+    proj_name = 'cov_analysis'
+
     target_path = args.target
     if args.address:
         address = args.address
@@ -91,7 +94,4 @@ if __name__ == "__main__":
     else:
         targets = get_targets_from_file(target_path)
 
-    proj_dir = workdir + '/traces/ghidra'
-    proj_name = 'cov_analysis'
-    # print(targets)
     ghidra_import_targets(proj_dir, proj_name, ghidra_bin, targets)
