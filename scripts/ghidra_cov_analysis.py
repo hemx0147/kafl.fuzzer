@@ -330,11 +330,12 @@ def main():
     print
     if print_missing:
         for func, blocks in sorted(blocks_map.items(), key=lambda x: str(x[0]).lower):
+            total = blocks_map[func]
             if func in func_blacklist:
-                print "Ignore: %3d blocks in %s" % (blocks, func)
+                print "Ignore: %3d from %3d blocks in %s" % (blocks, total, func)
                 continue
             if func not in reached_map and blocks > ignore_threshold:
-                print "Missed: %3d blocks in %s" % (blocks, func)
+                print "Missed: %3d from %3d blocks in %s" % (blocks, total, func)
 
     if print_implicit and len(implicit_blocks):
         print "\nMarked %d implicitly reached blocks:\n\t%s" % (

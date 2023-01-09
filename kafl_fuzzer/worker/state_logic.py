@@ -7,6 +7,7 @@
 Main logic used by Worker to push nodes through various fuzzing stages/mutators.
 """
 
+import os
 import time
 
 from kafl_fuzzer.common.rand import rand
@@ -192,6 +193,33 @@ class FuzzingStateLogic:
         timer_end = time.time()
         self.performance = (timer_end-timer_start) / num_execs
 
+        ## TDX / agent-specific trace execution
+        ## The agent_flags is a custom field in the payload buffer
+        ## and not complatible with other harnesses at this point!
+
+        # execute once to dump payload
+        self.worker.q.set_agent_flags(1)
+        self.execute_naked(payload, timeout=10, label="dump")
+        self.worker.q.set_agent_flags(0)
+        # execute once to dump fuzzing stats
+        self.worker.q.set_agent_flags(2)
+        self.execute_naked(payload, timeout=10, label="stats")
+        self.worker.q.set_agent_flags(0)
+        # execute once to collect stack dumps, redirecting to custom hprintf logfile
+        self.worker.q.set_agent_flags(4)
+        old_enable = self.worker.q.hprintf_log
+        old_logfile = self.worker.q.hprintf_logfile
+        self.worker.q.hprintf_log = True
+        dump_dir = self.config.work_dir + "/dump/"
+        self.worker.q.hprintf_logfile = dump_dir + "stackdump_%05d.log" % metadata['id']
+        if os.path.exists(self.worker.q.hprintf_logfile):
+            # this can happen if a previous Worker died performing the init stage of this payload
+            self.logger.warn(f"Overwriting existing stackdump at {self.worker.q.hprintf_logfile}")
+        self.execute_naked(payload, timeout=10, label="stats")
+        self.worker.q.hprintf_log = old_enable
+        self.worker.q.hprintf_logfile = old_logfile
+        self.worker.q.set_agent_flags(0)
+
         # Trimming only for stable + non-crashing inputs
         if metadata["info"]["exit_reason"] != "regular": #  or metadata["info"]["stable"]:
             self.logger.debug("Validate: Skip trimming..")
@@ -258,9 +286,22 @@ class FuzzingStateLogic:
             grimoire.havoc(generalized_input, self.execute, self.grimoire, havoc_amount, generalized=False)
 
     def handle_redqueen(self, payload, metadata):
+
+        if not self.config.redqueen:
+            return
+
         redqueen_start_time = time.time()
-        if self.config.redqueen:
-            self.__perform_redqueen(payload, metadata)
+
+        success = self.__perform_redqueen(payload, metadata)
+        if not success and self.config.funky:
+            success = self.__perform_redqueen(payload, metadata)
+            if success:
+                self.logger.warn("[funky] Redqueen success in 2nd round (id=%d)" % metadata["id"])
+        if not success and self.config.funky:
+            success = self.__perform_redqueen(payload, metadata)
+            if success:
+                self.logger.warn("[funky] Redqueen success in 3nd round (id=%d)" % metadata["id"])
+
         self.redqueen_time += time.time() - redqueen_start_time
 
     def handle_havoc(self, payload, metadata):
@@ -307,6 +348,13 @@ class FuzzingStateLogic:
         parent_info = self.get_parent_info(extra_info)
         return self.worker.validate_bytes(payload, metadata, parent_info)
 
+    def execute_naked(self, payload, timeout=None, label=None):
+        self.stage_info_execs += 1
+
+        if label and label != self.stage_info["method"]:
+            self.stage_update_label(label)
+
+        return self.worker.execute_naked(payload, timeout=timeout)
 
     def execute(self, payload, label=None, extra_info=None):
 
@@ -330,12 +378,15 @@ class FuzzingStateLogic:
 
     def __get_bitmap_hash(self, payload):
         bitmap, _ = self.execute(payload)
-        if bitmap is None:
-            return None
         return bitmap.hash()
 
 
     def __get_bitmap_hash_robust(self, payload):
+        # FIXME: make this work in funky mode
+        # - execute() is always robust relative to 'funky' setting
+        # - this check still kind of works but could be done earlier:
+        #   it tells if a payload is stable relative to current -funky setting
+        # - for funky mode, we still need to implement a funky 'trace' mode
         hashes = {self.__get_bitmap_hash(payload) for _ in range(3)}
         if len(hashes) == 1:
             return hashes.pop()
@@ -350,20 +401,25 @@ class FuzzingStateLogic:
         extension = bytes([207, 117, 130, 107, 183, 200, 143, 154])
         appended_hash = self.__get_bitmap_hash_robust(payload + extension)
 
+        if not orig_hash or not appended_hash:
+            # abort early if payload is unstable. Caller may retry..
+            self.logger.info("Redqueen: Input %d not stable, skipping.." % metadata["id"])
+            return False
+
         if orig_hash and orig_hash == appended_hash:
             self.logger.debug("Redqueen: Input can be extended")
             payload_array = bytearray(payload + extension)
         else:
             payload_array = bytearray(payload)
 
-        colored_alternatives = self.__perform_coloring(payload_array)
+        colored_alternatives = self.__perform_coloring(payload)
         if colored_alternatives:
             payload_array = colored_alternatives[0]
             assert isinstance(colored_alternatives[0], bytearray), print(
                     "!! ColoredAlternatives:", repr(colored_alternatives[0]), type(colored_alternatives[0]))
         else:
-            self.logger.debug("Redqueen: Input is not stable, skipping..")
-            return
+            self.logger.info("Redqueen: Input %d not stable after coloring, skipping.." % metadata["id"])
+            return False
 
         self.stage_update_label("redq_trace")
         rq_info = RedqueenInfoGatherer()
@@ -384,6 +440,7 @@ class FuzzingStateLogic:
         # for addr in rq_info.get_boring_cmps():
         #    self.redqueen_state.blacklist_cmp_addr(addr)
         # self.redqueen_state.update_redqueen_blacklist(RedqueenWorkdir(0))
+        return True
 
 
     def dilate_effector_map(self, effector_map, limiter_map):

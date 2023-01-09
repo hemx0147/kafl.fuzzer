@@ -1,0 +1,642 @@
+[
+    {
+        "name": "AcpiTableDxe",
+        "img_base": "0x3e23e000",
+        "text_start": "0x3e23e240",
+        "text_end": "0x3e244095",
+        "text_size": 24149,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/AcpiTableDxe.debug"
+    },
+    {
+        "name": "AtaAtapiPassThruDxe",
+        "img_base": "0x3e137000",
+        "text_start": "0x3e137240",
+        "text_end": "0x3e142055",
+        "text_size": 44565,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/AtaAtapiPassThruDxe.debug"
+    },
+    {
+        "name": "AtaBusDxe",
+        "img_base": "0x3cc81000",
+        "text_start": "0x3cc81240",
+        "text_end": "0x3cc87415",
+        "text_size": 25045,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/AtaBusDxe.debug"
+    },
+    {
+        "name": "BdsDxe",
+        "img_base": "0x3e1cc000",
+        "text_start": "0x3e1cc240",
+        "text_end": "0x3e1e6c76",
+        "text_size": 109110,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/BdsDxe.debug"
+    },
+    {
+        "name": "BootGraphicsResourceTableDxe",
+        "img_base": "0x3cc7a000",
+        "text_start": "0x3cc7a240",
+        "text_end": "0x3cc7c7b5",
+        "text_size": 9589,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/BootGraphicsResourceTableDxe.debug"
+    },
+    {
+        "name": "CapsuleRuntimeDxe",
+        "img_base": "0x3cca4000",
+        "text_start": "0x3cca5000",
+        "text_end": "0x3cca6fb5",
+        "text_size": 8117,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/CapsuleRuntimeDxe.debug"
+    },
+    {
+        "name": "ConPlatformDxe",
+        "img_base": "0x3e17b000",
+        "text_start": "0x3e17b240",
+        "text_end": "0x3e17ec15",
+        "text_size": 14805,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/ConPlatformDxe.debug"
+    },
+    {
+        "name": "ConSplitterDxe",
+        "img_base": "0x3e173000",
+        "text_start": "0x3e173240",
+        "text_end": "0x3e179975",
+        "text_size": 26421,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/ConSplitterDxe.debug"
+    },
+    {
+        "name": "CpuDxe",
+        "img_base": "0x3e274000",
+        "text_start": "0x3e274240",
+        "text_end": "0x3e2824fe",
+        "text_size": 58046,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/CpuDxe_6490f1c5-ebcc-4665-8892-0075b9bb49b7.debug"
+    },
+    {
+        "name": "CpuIo2Dxe",
+        "img_base": "0x3e28f000",
+        "text_start": "0x3e28f240",
+        "text_end": "0x3e2918d5",
+        "text_size": 9877,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/CpuIo2Dxe.debug"
+    },
+    {
+        "name": "DevicePathDxe",
+        "img_base": "0x3e2a9000",
+        "text_start": "0x3e2a9240",
+        "text_end": "0x3e2b36d5",
+        "text_size": 42133,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/DevicePathDxe.debug"
+    },
+    {
+        "name": "DiskIoDxe",
+        "img_base": "0x3e160000",
+        "text_start": "0x3e160240",
+        "text_end": "0x3e1645f5",
+        "text_size": 17333,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/DiskIoDxe.debug"
+    },
+    {
+        "name": "DisplayEngine",
+        "img_base": "0x3e1ad000",
+        "text_start": "0x3e1ad240",
+        "text_end": "0x3e1be28f",
+        "text_size": 69711,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/DisplayEngine.debug"
+    },
+    {
+        "name": "DriverHealthManagerDxe",
+        "img_base": "0x3e1e8000",
+        "text_start": "0x3e1e8240",
+        "text_end": "0x3e1ed695",
+        "text_size": 21589,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/DriverHealthManagerDxe.debug"
+    },
+    {
+        "name": "DxeCore",
+        "img_base": "0x3e73a000",
+        "text_start": "0x3e73a240",
+        "text_end": "0x3e75eacc",
+        "text_size": 149644,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/DxeCore.debug"
+    },
+    {
+        "name": "EbcDxe",
+        "img_base": "0x3e292000",
+        "text_start": "0x3e292240",
+        "text_end": "0x3e2979d5",
+        "text_size": 22421,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/EbcDxe.debug"
+    },
+    {
+        "name": "EhciDxe",
+        "img_base": "0x3cc2a000",
+        "text_start": "0x3cc2a240",
+        "text_end": "0x3cc32655",
+        "text_size": 33813,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/EhciDxe.debug"
+    },
+    {
+        "name": "EmuVariableFvbRuntimeDxe",
+        "img_base": "0x3e2c2000",
+        "text_start": "0x3e2c3000",
+        "text_end": "0x3e2c5c35",
+        "text_size": 11317,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/EmuVariableFvbRuntimeDxe.debug"
+    },
+    {
+        "name": "EnglishDxe",
+        "img_base": "0x3e156000",
+        "text_start": "0x3e156240",
+        "text_end": "0x3e157d55",
+        "text_size": 6933,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/EnglishDxe.debug"
+    },
+    {
+        "name": "Fat",
+        "img_base": "0x3cc4b000",
+        "text_start": "0x3cc4b240",
+        "text_end": "0x3cc54975",
+        "text_size": 38709,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/Fat.debug"
+    },
+    {
+        "name": "FaultTolerantWriteDxe",
+        "img_base": "0x3e1f0000",
+        "text_start": "0x3e1f0240",
+        "text_end": "0x3e1f5975",
+        "text_size": 22325,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/FaultTolerantWriteDxe.debug"
+    },
+    {
+        "name": "FvbServicesRuntimeDxe",
+        "img_base": "0x3e2dc000",
+        "text_start": "0x3e2dd000",
+        "text_end": "0x3e2e2035",
+        "text_size": 20533,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/FvbServicesRuntimeDxe.debug"
+    },
+    {
+        "name": "GraphicsConsoleDxe",
+        "img_base": "0x3e16d000",
+        "text_start": "0x3e16d240",
+        "text_end": "0x3e171535",
+        "text_size": 17141,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/GraphicsConsoleDxe.debug"
+    },
+    {
+        "name": "HiiDatabase",
+        "img_base": "0x3e249000",
+        "text_start": "0x3e249240",
+        "text_end": "0x3e265d24",
+        "text_size": 117476,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/HiiDatabase.debug"
+    },
+    {
+        "name": "IncompatiblePciDeviceSupportDxe",
+        "img_base": "0x3e270000",
+        "text_start": "0x3e270240",
+        "text_end": "0x3e272095",
+        "text_size": 7765,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/IncompatiblePciDeviceSupportDxe.debug"
+    },
+    {
+        "name": "IoMmuDxe",
+        "img_base": "0x3e238000",
+        "text_start": "0x3e238240",
+        "text_end": "0x3e23d7f5",
+        "text_size": 21941,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/IoMmuDxe.debug"
+    },
+    {
+        "name": "LinuxInitrdDynamicShellCommand",
+        "img_base": "0x3e1fb000",
+        "text_start": "0x3e1fb240",
+        "text_end": "0x3e201cf5",
+        "text_size": 27317,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/LinuxInitrdDynamicShellCommand.debug"
+    },
+    {
+        "name": "LocalApicTimerDxe",
+        "img_base": "0x3e235000",
+        "text_start": "0x3e235240",
+        "text_end": "0x3e237cd5",
+        "text_size": 10901,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/LocalApicTimerDxe.debug"
+    },
+    {
+        "name": "LogoDxe",
+        "img_base": "0x3e1f6000",
+        "text_start": "0x3e1f6240",
+        "text_end": "0x3e1f7ad5",
+        "text_size": 6293,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/LogoDxe.debug"
+    },
+    {
+        "name": "Metronome",
+        "img_base": "0x3e267000",
+        "text_start": "0x3e267240",
+        "text_end": "0x3e269575",
+        "text_size": 9013,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/Metronome.debug"
+    },
+    {
+        "name": "MonotonicCounterRuntimeDxe",
+        "img_base": "0x3cca8000",
+        "text_start": "0x3cca9000",
+        "text_end": "0x3ccaacb5",
+        "text_size": 7349,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/MonotonicCounterRuntimeDxe.debug"
+    },
+    {
+        "name": "NullMemoryTestDxe",
+        "img_base": "0x3e246000",
+        "text_start": "0x3e246240",
+        "text_end": "0x3e2480d5",
+        "text_size": 7829,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/NullMemoryTestDxe.debug"
+    },
+    {
+        "name": "NvmExpressDxe",
+        "img_base": "0x3cc6d000",
+        "text_start": "0x3cc6d240",
+        "text_end": "0x3cc76935",
+        "text_size": 38645,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/NvmExpressDxe.debug"
+    },
+    {
+        "name": "PartitionDxe",
+        "img_base": "0x3e159000",
+        "text_start": "0x3e159240",
+        "text_end": "0x3e15f395",
+        "text_size": 24917,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PartitionDxe.debug"
+    },
+    {
+        "name": "PcRtc",
+        "img_base": "0x3ccac000",
+        "text_start": "0x3ccad000",
+        "text_end": "0x3ccb1095",
+        "text_size": 16533,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PcRtc.debug"
+    },
+    {
+        "name": "PcdDxe",
+        "img_base": "0x3e2a3000",
+        "text_start": "0x3e2a3240",
+        "text_end": "0x3e2a8775",
+        "text_size": 21813,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PcdDxe.debug"
+    },
+    {
+        "name": "PciBusDxe",
+        "img_base": "0x3e194000",
+        "text_start": "0x3e194240",
+        "text_end": "0x3e1a29c4",
+        "text_size": 59268,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PciBusDxe.debug"
+    },
+    {
+        "name": "PciHostBridgeDxe",
+        "img_base": "0x3e22a000",
+        "text_start": "0x3e22a240",
+        "text_end": "0x3e233fd5",
+        "text_size": 40341,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PciHostBridgeDxe.debug"
+    },
+    {
+        "name": "PciHotPlugInitDxe",
+        "img_base": "0x3e26a000",
+        "text_start": "0x3e26a240",
+        "text_end": "0x3e26f155",
+        "text_size": 20245,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PciHotPlugInitDxe.debug"
+    },
+    {
+        "name": "PciSioSerialDxe",
+        "img_base": "0x3cc5f000",
+        "text_start": "0x3cc5f240",
+        "text_end": "0x3cc64d55",
+        "text_size": 23317,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PciSioSerialDxe.debug"
+    },
+    {
+        "name": "PlatformDxe",
+        "img_base": "0x3e1a3000",
+        "text_start": "0x3e1a3240",
+        "text_end": "0x3e1a8415",
+        "text_size": 20949,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/PlatformDxe.debug"
+    },
+    {
+        "name": "Ps2KeyboardDxe",
+        "img_base": "0x3cc67000",
+        "text_start": "0x3cc67240",
+        "text_end": "0x3cc6ca75",
+        "text_size": 22581,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/Ps2KeyboardDxe.debug"
+    },
+    {
+        "name": "QemuFwCfgAcpiPlatform",
+        "img_base": "0x3e203000",
+        "text_start": "0x3e203240",
+        "text_end": "0x3e209cb5",
+        "text_size": 27253,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/QemuFwCfgAcpiPlatform.debug"
+    },
+    {
+        "name": "QemuKernelLoaderFsDxe",
+        "img_base": "0x3e160000",
+        "text_start": "0x3e160240",
+        "text_end": "0x3e164255",
+        "text_size": 16405,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/QemuKernelLoaderFsDxe.debug"
+    },
+    {
+        "name": "QemuRamfbDxe",
+        "img_base": "0x3e1f1000",
+        "text_start": "0x3e1f1240",
+        "text_end": "0x3e1f5d15",
+        "text_size": 19157,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/QemuRamfbDxe.debug"
+    },
+    {
+        "name": "QemuVideoDxe",
+        "img_base": "0x3c9f9000",
+        "text_start": "0x3c9f9240",
+        "text_end": "0x3c9ff5d5",
+        "text_size": 25493,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/QemuVideoDxe.debug"
+    },
+    {
+        "name": "RamDiskDxe",
+        "img_base": "0x3e1c1000",
+        "text_start": "0x3e1c1240",
+        "text_end": "0x3e1ca2b5",
+        "text_size": 36981,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/RamDiskDxe.debug"
+    },
+    {
+        "name": "ReportStatusCodeRouterRuntimeDxe",
+        "img_base": "0x3e2d5000",
+        "text_start": "0x3e2d6000",
+        "text_end": "0x3e2d9115",
+        "text_size": 12565,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/ReportStatusCodeRouterRuntimeDxe.debug"
+    },
+    {
+        "name": "ResetSystemRuntimeDxe",
+        "img_base": "0x3e2c8000",
+        "text_start": "0x3e2c9000",
+        "text_end": "0x3e2cc515",
+        "text_size": 13589,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/ResetSystemRuntimeDxe.debug"
+    },
+    {
+        "name": "RuntimeDxe",
+        "img_base": "0x3e2cf000",
+        "text_start": "0x3e2d0000",
+        "text_end": "0x3e2d2af5",
+        "text_size": 10997,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/RuntimeDxe.debug"
+    },
+    {
+        "name": "S3SaveStateDxe",
+        "img_base": "0x3e237000",
+        "text_start": "0x3e237240",
+        "text_end": "0x3e23ccd5",
+        "text_size": 23189,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/S3SaveStateDxe.debug"
+    },
+    {
+        "name": "SataController",
+        "img_base": "0x3e143000",
+        "text_start": "0x3e143240",
+        "text_end": "0x3e146095",
+        "text_size": 11861,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/SataController.debug"
+    },
+    {
+        "name": "ScsiBus",
+        "img_base": "0x3e151000",
+        "text_start": "0x3e151240",
+        "text_end": "0x3e154d95",
+        "text_size": 15189,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/ScsiBus.debug"
+    },
+    {
+        "name": "ScsiDisk",
+        "img_base": "0x3e147000",
+        "text_start": "0x3e147240",
+        "text_end": "0x3e150b95",
+        "text_size": 39253,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/ScsiDisk.debug"
+    },
+    {
+        "name": "SecMain",
+        "img_base": "0xfffcc094",
+        "text_start": "0xfffcc2d4",
+        "text_end": "0xfffe0ae2",
+        "text_size": 83982,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/SecMain.debug"
+    },
+    {
+        "name": "SecurityStubDxe",
+        "img_base": "0x3e298000",
+        "text_start": "0x3e298240",
+        "text_end": "0x3e29cdf5",
+        "text_size": 19381,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/SecurityStubDxe.debug"
+    },
+    {
+        "name": "SetupBrowser",
+        "img_base": "0x3e211000",
+        "text_start": "0x3e211240",
+        "text_end": "0x3e229413",
+        "text_size": 98771,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/SetupBrowser.debug"
+    },
+    {
+        "name": "Shell",
+        "img_base": "0x3c731000",
+        "text_start": "0x3c731240",
+        "text_end": "0x3c7a9544",
+        "text_size": 492292,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/Shell.debug"
+    },
+    {
+        "name": "SioBusDxe",
+        "img_base": "0x3cc7d000",
+        "text_start": "0x3cc7d240",
+        "text_end": "0x3cc7ff95",
+        "text_size": 11605,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/SioBusDxe.debug"
+    },
+    {
+        "name": "SmbiosDxe",
+        "img_base": "0x3e20a000",
+        "text_start": "0x3e20a240",
+        "text_end": "0x3e20fd55",
+        "text_size": 23317,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/SmbiosDxe.debug"
+    },
+    {
+        "name": "SmbiosPlatformDxe",
+        "img_base": "0x3e1a9000",
+        "text_start": "0x3e1a9240",
+        "text_end": "0x3e1ac575",
+        "text_size": 13109,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/SmbiosPlatformDxe.debug"
+    },
+    {
+        "name": "StatusCodeHandlerRuntimeDxe",
+        "img_base": "0x3ccc5000",
+        "text_start": "0x3ccc6000",
+        "text_end": "0x3ccc82d5",
+        "text_size": 8917,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/StatusCodeHandlerRuntimeDxe.debug"
+    },
+    {
+        "name": "TdTcg2Dxe",
+        "img_base": "0x3e1e8000",
+        "text_start": "0x3e1e8240",
+        "text_end": "0x3e1ef595",
+        "text_size": 29525,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/TdTcg2Dxe.debug"
+    },
+    {
+        "name": "TdxDxe",
+        "img_base": "0x3e29e000",
+        "text_start": "0x3e29e240",
+        "text_end": "0x3e2a2c55",
+        "text_size": 18965,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/TdxDxe.debug"
+    },
+    {
+        "name": "TerminalDxe",
+        "img_base": "0x3e165000",
+        "text_start": "0x3e165240",
+        "text_end": "0x3e16c575",
+        "text_size": 29493,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/TerminalDxe.debug"
+    },
+    {
+        "name": "UdfDxe",
+        "img_base": "0x3cc44000",
+        "text_start": "0x3cc44240",
+        "text_end": "0x3cc49ef5",
+        "text_size": 23733,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/UdfDxe.debug"
+    },
+    {
+        "name": "UhciDxe",
+        "img_base": "0x3cc33000",
+        "text_start": "0x3cc33240",
+        "text_end": "0x3cc39c95",
+        "text_size": 27221,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/UhciDxe.debug"
+    },
+    {
+        "name": "UsbBusDxe",
+        "img_base": "0x3cc20000",
+        "text_start": "0x3cc20240",
+        "text_end": "0x3cc29035",
+        "text_size": 36341,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/UsbBusDxe.debug"
+    },
+    {
+        "name": "UsbKbDxe",
+        "img_base": "0x3cc09000",
+        "text_start": "0x3cc09240",
+        "text_end": "0x3cc0e995",
+        "text_size": 22357,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/UsbKbDxe.debug"
+    },
+    {
+        "name": "UsbMassStorageDxe",
+        "img_base": "0x3cc03000",
+        "text_start": "0x3cc03240",
+        "text_end": "0x3cc08775",
+        "text_size": 21813,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/UsbMassStorageDxe.debug"
+    },
+    {
+        "name": "VariableRuntimeDxe",
+        "img_base": "0x3e2b8000",
+        "text_start": "0x3e2b9000",
+        "text_end": "0x3e2c5938",
+        "text_size": 51512,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/VariableRuntimeDxe.debug"
+    },
+    {
+        "name": "Virtio10",
+        "img_base": "0x3e18b000",
+        "text_start": "0x3e18b240",
+        "text_end": "0x3e18f915",
+        "text_size": 18133,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/Virtio10.debug"
+    },
+    {
+        "name": "VirtioBlkDxe",
+        "img_base": "0x3e187000",
+        "text_start": "0x3e187240",
+        "text_end": "0x3e18a415",
+        "text_size": 12757,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/VirtioBlkDxe.debug"
+    },
+    {
+        "name": "VirtioFsDxe",
+        "img_base": "0x3cc3a000",
+        "text_start": "0x3cc3a240",
+        "text_end": "0x3cc430f5",
+        "text_size": 36533,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/VirtioFsDxe.debug"
+    },
+    {
+        "name": "VirtioGpuDxe",
+        "img_base": "0x3c9f3000",
+        "text_start": "0x3c9f3240",
+        "text_end": "0x3c9f8bf5",
+        "text_size": 22965,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/VirtioGpuDxe.debug"
+    },
+    {
+        "name": "VirtioPciDeviceDxe",
+        "img_base": "0x3e190000",
+        "text_start": "0x3e190240",
+        "text_end": "0x3e192db5",
+        "text_size": 11125,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/VirtioPciDeviceDxe.debug"
+    },
+    {
+        "name": "VirtioRngDxe",
+        "img_base": "0x3e17f000",
+        "text_start": "0x3e17f240",
+        "text_end": "0x3e181dd5",
+        "text_size": 11157,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/VirtioRngDxe.debug"
+    },
+    {
+        "name": "VirtioScsiDxe",
+        "img_base": "0x3e183000",
+        "text_start": "0x3e183240",
+        "text_end": "0x3e1868d5",
+        "text_size": 13973,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/VirtioScsiDxe.debug"
+    },
+    {
+        "name": "WatchdogTimer",
+        "img_base": "0x3e1ee000",
+        "text_start": "0x3e1ee240",
+        "text_end": "0x3e1efdf5",
+        "text_size": 7093,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/WatchdogTimer.debug"
+    },
+    {
+        "name": "XhciDxe",
+        "img_base": "0x3cc10000",
+        "text_start": "0x3cc10240",
+        "text_end": "0x3cc1cc95",
+        "text_size": 51797,
+        "debug_path": "/home/ubuntu/tdvfuzz/tdvf/Build/IntelTdx/DEBUG_GCC5/X64/XhciDxe.debug"
+    }
+]
