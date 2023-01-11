@@ -14,3 +14,4 @@ python-dateutil
 west
 confuse
 flatdict
+pyelftools
