@@ -118,18 +118,18 @@ class qemu:
             self.cmd.extend(["-s", "-S"])
 
         # Lauch either as VM snapshot, direct kernel/initrd boot, or -bios boot
-        if self.config.qemu_image:
-            self.cmd.extend(["-drive", "file=" + self.config.qemu_image])
-        if self.config.qemu_kernel:
-            self.cmd.extend(["-kernel", self.config.qemu_kernel])
-            if self.config.qemu_initrd:
-                self.cmd.extend(["-initrd", self.config.qemu_initrd])
+        # if self.config.qemu_image:
+        #     self.cmd.extend(["-drive", "file=" + self.config.qemu_image])
+        # if self.config.qemu_kernel:
+        #     self.cmd.extend(["-kernel", self.config.qemu_kernel])
+        #     if self.config.qemu_initrd:
+        #         self.cmd.extend(["-initrd", self.config.qemu_initrd])
         if self.config.qemu_bios:
             self.cmd.extend(["-bios", self.config.qemu_bios])
 
         # Qemu -append option
-        if self.config.qemu_append:
-            self.cmd.extend(["-append", self.config.qemu_append])
+        # if self.config.qemu_append:
+        #     self.cmd.extend(["-append", self.config.qemu_append])
 
         # Qemu extra options
         if self.config.qemu_extra:

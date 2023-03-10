@@ -150,12 +150,12 @@ def add_args_qemu(parser):
                         type=parse_is_dir, help='path to VM pre-snapshot directory.')
     parser.add_argument('--bios', dest='qemu_bios', metavar='<file>', required=False, action=ExpandVars, type=parse_is_file,
                         help='path to the BIOS image.')
-    parser.add_argument('--kernel', dest='qemu_kernel', metavar='<file>', required=False, action=ExpandVars,
-                        type=parse_is_file, help='path to the Kernel image.')
-    parser.add_argument('--initrd', dest='qemu_initrd', metavar='<file>', required=False, action=ExpandVars, type=parse_is_file,
-                        help='path to the initrd/initramfs file.')
-    parser.add_argument('--append', dest='qemu_append', metavar='<str>', help='Qemu -append option',
-                        type=str, required=False, default=None)
+    # parser.add_argument('--kernel', dest='qemu_kernel', metavar='<file>', required=False, action=ExpandVars,
+    #                     type=parse_is_file, help='path to the Kernel image.')
+    # parser.add_argument('--initrd', dest='qemu_initrd', metavar='<file>', required=False, action=ExpandVars, type=parse_is_file,
+    #                     help='path to the initrd/initramfs file.')
+    # parser.add_argument('--append', dest='qemu_append', metavar='<str>', help='Qemu -append option',
+    #                     type=str, required=False, default=None)
     parser.add_argument('-m', '--memory', dest='qemu_memory', metavar='<n>', help='size of VM RAM in MB (default: 256).',
                         default=256, type=int)
 
