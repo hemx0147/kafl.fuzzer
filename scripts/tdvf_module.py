@@ -1,11 +1,11 @@
 # Some helper classes to deal with TDVF modules
 
-import re
 import json
 from enum import Enum
 import os.path
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from elftools.elf.elffile import ELFFile
+from collections import OrderedDict
 
 
 class Address:
@@ -30,13 +30,21 @@ class Address:
 
     def __str__(self) -> str:
         return self.__address
-    
+
     def __int__(self) -> int:
         return self.__value
-    
+
     def __add__(self, other):
         return Address(int(self) + int(other))
-    
+
+    def __lt__(self, other):
+        return self.__value < other.__value
+
+    def __gt__(self, other):
+        return self.__value > other.__value
+
+    def __eq__(self, other):
+        return self.__value == other.__value
 
 
 class TdvfModule:
@@ -61,9 +69,16 @@ class TdvfModule:
     def __str__(self) -> str:
         return str(self.to_dict())
 
-    # define less-than method so class instances can be easily sorted
+    # define compare-methods so class instances can be easily sorted
+    # comparisons are done via start of .text section
     def __lt__(self, other): 
-        return self.name < other.name
+        return self.t_start < other.t_start or (self.t_start == other.t_start and self.t_end < other.t_end)
+
+    def __gt__(self, other):
+        return self.t_start > other.t_start or (self.t_start == other.t_start and self.t_end > other.t_end)
+
+    def __eq__(self, other):
+        return self.t_start == other.t_start and self.t_end == other.t_end
 
     @property
     def name(self) -> str:
@@ -190,9 +205,11 @@ class TdvfModule:
 
 class TdvfModuleTable:
     '''A sorted dict of TDVF modules that can be presented in tabular form'''
-    def __init__(self, modules=None):
+    def __init__(self, modules:Dict[str, TdvfModule]=None):
         '''create a new TdvfModuleTable'''
-        self.modules = modules
+        self.modules = OrderedDict(sorted(modules.items(), key=lambda item: item[1]))
+        module_adrs = [m.t_start for m in self.modules.values()]
+        assert module_adrs == sorted(module_adrs)
 
     def __str__(self):
         s = ''
@@ -220,7 +237,7 @@ class TdvfModuleTable:
         for m in modules:
             if not isinstance(m, TdvfModule):
                 assert m['name'], "module name is empty"
-        self.__modules = dict((m.name, m) for m in sorted(modules))
+        self.__modules = OrderedDict((m.name, m) for m in sorted(modules))
 
     def fill_text_info(self):
         '''fill all modules missing .text start, -end & -size info'''
@@ -243,7 +260,7 @@ class TdvfModuleTable:
             print('-' * 164)
         
         # print body
-        for module in self.modules.values():
+        for module in sorted(self.modules.values()):
             if only_modules and module.name not in only_modules:
                 # if only_modules is given, print only those
                 continue
@@ -285,9 +302,9 @@ class TdvfModuleTable:
         with open(file_name, 'r') as f:
             module_info = json.load(f)
         
-        modules = []
+        modules = {}
         for minfo in module_info:
             m = TdvfModule()
             m.from_dict(minfo)
-            modules.append(m)
+            modules[m.name] = m
         self.__init__(modules)
