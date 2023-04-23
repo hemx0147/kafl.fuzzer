@@ -351,8 +351,16 @@ def main():
     blocks_ignored = sum([blocks_map.get(func, 0) for func in func_blacklist])
 
     filtered_blocks = reached_blocks + missing_blocks
-    block_cov = reached_blocks * 100 / filtered_blocks
-    func_cov = len(reached_map) * 100 / len(blocks_map)
+    block_cov = 0
+    func_cov = 0
+    reached_funcs = 0
+    # prevent zero division errors
+    if reached_blocks > 0 and filtered_blocks > 0:
+        block_cov = reached_blocks * 100 / filtered_blocks
+    if len(reached_map) > 0 and len(blocks_map) > 0:
+        func_cov = len(reached_map) * 100 / len(blocks_map)
+    if total_blocks_reachable > 0:
+        100*reached_blocks/total_blocks_reachable
 
     print
     print "Total blocks in file: %6d" % total_blocks
@@ -365,7 +373,7 @@ def main():
     print "Total reached funcs:  %6d / %6d (%d%%)" % (len(reached_map), len(blocks_map), func_cov)
     print "Total reached blocks: %6d / %6d (%d%%)" % (reached_blocks, filtered_blocks, block_cov)
     print " ..in reached funcs:  %6d / %6d (%d%%)" % (reached_blocks, total_blocks_reachable,
-                                                      100*reached_blocks/total_blocks_reachable)
+                                                      reached_funcs)
     print "  Blocks not reached: %6d" % missing_blocks
     print
 
