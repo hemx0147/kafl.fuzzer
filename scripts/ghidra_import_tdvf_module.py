@@ -84,7 +84,9 @@ if __name__ == "__main__":
     assert os.path.isfile(ghidra_bin), "Could not find Ghidra headless binary"
     workdir = args.workdir
     proj_dir = workdir + '/traces/ghidra'
-    assert os.path.isdir(proj_dir), 'workdir does not contain traces/ghidra subfolders'
+    if not os.path.exists(proj_dir):
+        os.makedirs(proj_dir)
+    assert os.path.isdir(proj_dir), 'workdir does not contain traces/ghidra subfolder'
     proj_name = 'cov_analysis'
 
     target_path = args.target
