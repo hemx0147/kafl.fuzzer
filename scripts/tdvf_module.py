@@ -207,9 +207,10 @@ class TdvfModuleTable:
     '''A sorted dict of TDVF modules that can be presented in tabular form'''
     def __init__(self, modules:Dict[str, TdvfModule]=None):
         '''create a new TdvfModuleTable'''
-        self.modules = OrderedDict(sorted(modules.items(), key=lambda item: item[1]))
-        module_adrs = [m.t_start for m in self.modules.values()]
-        assert module_adrs == sorted(module_adrs)
+        if modules:
+            self.modules = OrderedDict(sorted(modules.items(), key=lambda item: item[1]))
+            module_adrs = [m.t_start for m in self.modules.values()]
+            assert module_adrs == sorted(module_adrs)
 
     def __str__(self):
         s = ''
