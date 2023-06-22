@@ -15,3 +15,4 @@ west
 confuse
 flatdict
 pyelftools
+pefile

@@ -1,10 +1,9 @@
 # Some helper classes to deal with TDVF modules
 
 import json
-from enum import Enum
 import os.path
 from typing import List, Tuple, Dict
-from elftools.elf.elffile import ELFFile
+import pefile
 from collections import OrderedDict
 
 
@@ -48,23 +47,17 @@ class Address:
 
 
 class TdvfModule:
-    '''A TDVF module object consisting of module name, image base address, info about the .text section and the file path of the module's .debug file'''
+    '''A TDVF module object consisting of module name, image base address, info about the .text section, and the paths of the module's .debug and .efi files'''
 
-    class TMI(Enum):
-        mname = 'name'
-        img_base = 'img_base'
-        t_start = 'text_start'
-        t_end = 'text_end'
-        t_size = 'text_size'
-        d_path = 'debug_path'
-
-    def __init__(self, name:str='', img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, d_path:str=None):
+    def __init__(self, name:str='', img_base:int=0, t_start:int=0, t_end:int=0, t_size:int=0, bin_path:str=None, dbg_path:str=None, efi_path:str=None):
         self.name = name
         self.img_base = img_base
         self.t_start = t_start
         self.t_end = t_end
         self.t_size = t_size
-        self.d_path = d_path
+        self.bin_path = bin_path
+        self.dbg_path = dbg_path
+        self.efi_path = efi_path
     
     def __str__(self) -> str:
         return str(self.to_dict())
@@ -124,15 +117,49 @@ class TdvfModule:
         self.__t_size = size
 
     @property
-    def d_path(self) -> str:
-        return self.__d_path
+    def bin_path(self) -> str:
+        return self.__bin_path
 
-    @d_path.setter
-    def d_path(self, path:str):
+    @bin_path.setter
+    def bin_path(self, path:str):
         if path:
             assert isinstance(path, str), "path must be of type str"
-            assert os.path.exists(path), "invalid path to module .debug file"
-        self.__d_path = path
+            assert os.path.exists(path), "invalid path to module binary directory"
+        self.__bin_path = path
+
+    @property
+    def dbg_path(self) -> str:
+        return self.__dbg_path
+
+    @dbg_path.setter
+    def dbg_path(self, path:str):
+        if not path:
+            if self.bin_path and self.name:
+                path = self.bin_path + '/' + self.name + '.debug'
+        if path:
+            assert isinstance(path, str), "path must be of type str"
+            assert path.endswith('.debug') and os.path.exists(path), "invalid path to module .debug file"
+        self.__dbg_path = path
+
+    @property
+    def efi_path(self) -> str:
+        return self.__efi_path
+
+    @efi_path.setter
+    def efi_path(self, path:str):
+        if not path:
+            if self.bin_path and self.name:
+                path = self.bin_path + '/' + self.name + '.efi'
+        if path:
+            assert isinstance(path, str), "path must be of type str"
+            assert path.endswith('.efi') and os.path.exists(path), "invalid path to module .efi file"
+        self.__efi_path = path
+
+    def set_module_paths(self, bin_path:str, dbg_path:str=None, efi_path:str=None):
+        '''Set paths for module binary directory and module debug- and efi files. If a path to .debug or .efi file is not specified, it is assumed to exist within the bin_path directory.'''
+        self.bin_path = bin_path
+        self.dbg_path = dbg_path
+        self.efi_path = efi_path
 
     def to_dict(self) -> dict:
         d = {
@@ -141,7 +168,9 @@ class TdvfModule:
             'text_start': str(self.t_start),
             'text_end': str(self.t_end),
             'text_size': self.t_size,
-            'debug_path': self.d_path
+            'binary_path': self.bin_path,
+            'debug_path': self.dbg_path,
+            'efi_path': self.efi_path
         }
         return d
     
@@ -151,19 +180,18 @@ class TdvfModule:
         t_start = d['text_start']
         t_end = d['text_end']
         t_size = d['text_size']
-        d_path = d['debug_path']
-        self.__init__(name, img_base, t_start, t_end, t_size, d_path)
+        bin_path = d['binary_path']
+        if 'debug_path' in d.keys():
+            dbg_path = d['debug_path']
+        if 'efi_path' in d.keys():
+            efi_path = d['efi_path']
+        self.__init__(name, img_base, t_start, t_end, t_size, bin_path, dbg_path, efi_path)
     
     def get_toffset_and_tsize(self) -> Tuple[Address, int]:
-        '''analyze this module's .debug file and obtain offset & size of its .text section'''
-        with open(self.d_path, 'rb') as f:
-            module_elf = ELFFile(f)
-            for section in module_elf.iter_sections():
-                if not section.name.startswith('.text'):
-                    continue
-                tsize = section.header['sh_size']
-                toffset = section.header['sh_addr']
-                break
+        '''analyze this module's .efi file and obtain offset & size of its .text section'''
+        module_efi = pefile.PE(self.efi_path)
+        toffset = module_efi.OPTIONAL_HEADER.BaseOfCode
+        tsize = module_efi.OPTIONAL_HEADER.SizeOfCode
         return Address(toffset), tsize
     
     def compute_tstart(self, t_offset:Address) -> Address:
@@ -181,11 +209,11 @@ class TdvfModule:
         assert t_size, "cannot compute .text end without .text size"
         return Address(int(t_start) + t_size)
     
-    def fill_text_info(self, debug_path:str=None):
+    def fill_text_info(self, efi_path:str=None):
         '''fill the module's missing .text start, -end & -size info'''
-        if not debug_path:
-            debug_path = self.d_path
-        assert self.d_path, "must specify a valid module .debug file path"
+        if not efi_path:
+            efi_path = self.efi_path
+        assert efi_path, "must specify a valid module .efi file path"
         t_offset, self.t_size = self.get_toffset_and_tsize()
         self.t_start = self.compute_tstart(t_offset)
         self.t_end = self.compute_tend()
@@ -215,13 +243,14 @@ class TdvfModuleTable:
     def __str__(self):
         s = ''
         for module in self.modules.values():
-            _name = module.name
-            _base = Address(module.img_base)
-            _start = Address(module.t_start)
-            _end = Address(module.t_end)
-            _size = module.t_size
-            _path = module.d_path
-            s += f'{_name} {_base} {_start} {_end} {_size} {_path}\n'
+            name = module.name
+            base = Address(module.img_base)
+            tstart = Address(module.t_start)
+            tend = Address(module.t_end)
+            tsize = module.t_size
+            binpath = module.bin_path
+            # print only shortened version of file paths starting from inside TDVF Build directory
+            s += f'{name} {base} {tstart} {tend} {tsize} {binpath}\n'
         # use strip to remove the last (unnecessary) newline character
         return s.strip()
 
@@ -240,6 +269,11 @@ class TdvfModuleTable:
                 assert m['name'], "module name is empty"
         self.__modules = OrderedDict((m.name, m) for m in sorted(modules))
 
+    def set_module_paths(self, bin_path:str):
+        '''Set paths for module binary directory and module debug- and efi files for all modules. The module .debug & .efi files are assumed to exist within the bin_path directory.'''
+        for module in self.modules.values():
+            module.set_module_paths(bin_path)
+
     def fill_text_info(self):
         '''fill all modules missing .text start, -end & -size info'''
         for m in self.modules.values():
@@ -256,9 +290,9 @@ class TdvfModuleTable:
             hstart = ".text Start"
             hend = ".text End"
             hsize = "Size"
-            hpath = "Debug Path"
-            print(f'{hname:<32} {hbase:<12} {hstart:<12} {hend:<12} {hsize:<6} {hpath}')
-            print('-' * 164)
+            bpath = "Binary Path"
+            print(f'{hname:<32} {hbase:<12} {hstart:<12} {hend:<12} {hsize:<6} {bpath}')
+            print('-' * 138)
         
         # print body
         for module in sorted(self.modules.values()):
@@ -266,14 +300,14 @@ class TdvfModuleTable:
                 # if only_modules is given, print only those
                 continue
             if print_table:
-                _name = module.name
-                _base = _start = _end = _size = _path = ""
-                _base = str(module.img_base)[2:]
-                _start = str(module.t_start)[2:]
-                _end = str(module.t_end)[2:]
-                _size = module.t_size
-                _path = module.d_path
-                print(f'{_name:<32} {_base:0>12} {_start:0>12} {_end:0>12} {_size:>6} {_path}')
+                name = module.name
+                base = str(module.img_base)[2:]
+                tstart = str(module.t_start)[2:]
+                tend = str(module.t_end)[2:]
+                tsize = module.t_size
+                # print only shortened version of file paths starting from inside TDVF Build directory
+                bpath = module.bin_path
+                print(f'{name:<32} {base:0>12} {tstart:0>12} {tend:0>12} {tsize:<6} {bpath}')
             else:
                 module.print_short()
 
