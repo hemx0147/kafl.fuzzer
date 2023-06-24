@@ -290,9 +290,9 @@ class TdvfModuleTable:
             hstart = ".text Start"
             hend = ".text End"
             hsize = "Size"
-            bpath = "Binary Path"
-            print(f'{hname:<32} {hbase:<12} {hstart:<12} {hend:<12} {hsize:<6} {bpath}')
-            print('-' * 138)
+            dpath = "Debug Path"
+            print(f'{hname:<32} {hbase:<12} {hstart:<12} {hend:<12} {hsize:<6} {dpath}')
+            print('-' * 120)
         
         # print body
         for module in sorted(self.modules.values()):
@@ -306,8 +306,8 @@ class TdvfModuleTable:
                 tend = str(module.t_end)[2:]
                 tsize = module.t_size
                 # print only shortened version of file paths starting from inside TDVF Build directory
-                bpath = module.bin_path
-                print(f'{name:<32} {base:0>12} {tstart:0>12} {tend:0>12} {tsize:<6} {bpath}')
+                dpath = module.dbg_path
+                print(f'{name:<32} {base:0>12} {tstart:0>12} {tend:0>12} {tsize:<6} {dpath}')
             else:
                 module.print_short()
 
